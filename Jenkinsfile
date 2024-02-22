@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'kube-slave'
+        label 'python-slave'
     }
     stages {
         stage('Build') {
