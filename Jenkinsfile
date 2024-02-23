@@ -10,6 +10,7 @@ pipeline {
         }
         stage('Test') {
             steps {
+                sh 'ls -al'
                 sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
             }
             post {
@@ -20,6 +21,7 @@ pipeline {
         }
         stage('Deliver') {
             steps {
+                sh 'ls -al'
                 sh 'pyinstaller --onefile sources/add2vals.py'
             }
             post {
@@ -30,6 +32,7 @@ pipeline {
         }
         stage('Run') {
             steps {
+                sh 'ls -al'
                 sh 'dist/add2vals Ram Sreekar' 
             }
         }
