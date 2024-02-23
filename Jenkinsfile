@@ -11,13 +11,11 @@ podTemplate(containers: [
         )
 ]) {
 
-    node(POD_LABEL) {
+    node(POD_LABEL) { 
         container('python') {
             stage('Build') {
-                container('python') {
-                    sh 'ls -al'
-                    sh 'python3 -m py_compile sources/add2vals.py sources/calc.py'
-                }
+                sh 'ls -al'
+                sh 'python3 -m py_compile sources/add2vals.py sources/calc.py'
             }
             stage('Test') {
                 sh 'ls -al'
