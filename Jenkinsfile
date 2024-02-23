@@ -12,7 +12,15 @@ podTemplate(containers: [
 ]) {
 
     node(POD_LABEL) { 
+        container('jnlp') {
+            stage('Check is code files exist in thr req. dir.') {
+                sh 'ls -al /var/jenkins_home/workspace/python-app'
+            }
+        }
         container('python') {
+            stage('Check is code files exist in thr req. dir.') {
+                sh 'ls -al /var/jenkins_home/workspace/python-app'
+            }
             stage('Build') {
                 sh 'ls -al'
                 sh 'python3 -m py_compile sources/add2vals.py sources/calc.py'
