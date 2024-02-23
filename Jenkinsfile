@@ -1,53 +1,46 @@
-podTemplate(containers: [
-    containerTemplate(
-        name: 'jnlp', 
-        image: 'docker.io/jenkins/inbound-agent:latest-jdk17'
-        ), 
-    containerTemplate(
-        name: 'python', 
-        image: 'docker.io/jvrsreekar/py-build-test-tool:python-3.11.6-alpine',
-        command: 'sleep', 
-        args: '30d'
-        )
-]) {
+pipeline {
+    agent {
+    label 'java-slave'
+    }
+    stages {
+        stage('Build') {
+            steps {
+                container('python') {
+                    sh 'python3 -m py_compile sources/add2vals.py sources/calc.py'
+                }
+            } 
+        }
 
-    node(POD_LABEL) { 
-        container('jnlp') {
-            stage('Check is code files exist in thr req. dir.') {
-                sh 'ls -al /var/jenkins_home/workspace/python-app'
+        stage('Test') {
+            steps {
+                container('python') {
+                    sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
+                }
             }
         }
-        container('python') {
-            stage('Check is code files exist in thr req. dir.') {
-                sh 'ls -al /var/jenkins_home/workspace/python-app'
-            }
-            stage('Build') {
-                sh 'ls -al'
-                sh 'python3 -m py_compile sources/add2vals.py sources/calc.py'
-            }
-            stage('Test') {
-                sh 'ls -al'
-                sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
-                post {
-                    always {
-                        junit 'test-reports/results.xml'
-                    }
+
+        stage('Deliver') {
+            steps {
+                container('python') {
+                    sh 'pyinstaller --onefile sources/add2vals.py'
                 }
-            }
-            stage('Deliver') {
-                sh 'ls -al'
-                sh 'pyinstaller --onefile sources/add2vals.py'
-                post {
-                    success {
-                        archiveArtifacts 'dist/add2vals'
-                    }
-                }
-            }
-            stage('Run') {
-                sh 'ls -al'
-                sh 'dist/add2vals Ram Sreekar' 
-            }
+            } 
+        }
+
+        stage('Run') {
+            sh 'dist/add2vals Ram Sreekar' 
         }
     }
 
+    post {
+        always {
+            junit 'test-reports/results.xml'
+        }
+    }
+
+    post {
+        success {
+            archiveArtifacts 'dist/add2vals'
+        }
+    }
 }
