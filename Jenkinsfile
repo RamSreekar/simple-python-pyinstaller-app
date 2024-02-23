@@ -28,7 +28,12 @@ pipeline {
         }
 
         stage('Run') {
-            sh 'dist/add2vals Ram Sreekar' 
+            steps {
+                container('python') {
+                    sh 'dist/add2vals 1 4' 
+                    sh 'dist/add2vals Ram Sreekar' 
+                }
+            } 
         }
     }
 
@@ -36,9 +41,6 @@ pipeline {
         always {
             junit 'test-reports/results.xml'
         }
-    }
-
-    post {
         success {
             archiveArtifacts 'dist/add2vals'
         }
